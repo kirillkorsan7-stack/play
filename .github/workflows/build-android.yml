@@ -14,7 +14,7 @@ jobs:
 
       - name: Unpack project archive
         run: |
-          unzip -q BlockWorld3D_Android_Project.zip -d .
+          unzip -q BlockWorld3D_Android_Project_v3.zip -d .
           cd BlockWorld3D
           test -f project.godot
           test -f export_presets.cfg
