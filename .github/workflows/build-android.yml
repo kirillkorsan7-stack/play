@@ -31,7 +31,7 @@ jobs:
           packages: platform-tools
 
       - name: Install Android packages
-        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "cmdline-tools;latest"
+        run: sdkmanager "platform-tools" "platforms;android-34" "platforms;android-35" "build-tools;35.0.0" "cmdline-tools;latest"
 
       - name: Download Godot
         run: |
@@ -46,6 +46,18 @@ jobs:
           mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
           unzip -q Godot_v4.4.1-stable_export_templates.tpz -d /tmp/godot-templates
           cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+
+      - name: Patch project for Godot 4.4 Android export
+        working-directory: BlockWorld3D
+        run: |
+          sed -i 's/var x := \[-9.0, 9.0, 0.0\]\[i\]/var x: float = [-9.0, 9.0, 0.0][i]/' scripts/main.gd
+          sed -i 's/var z := \[4.0, -3.0, -10.0\]\[i\]/var z: float = [4.0, -3.0, -10.0][i]/' scripts/main.gd
+          sed -i 's/var delta := event.position - move_origin/var delta: Vector2 = event.position - move_origin/' scripts/main.gd
+          sed -i 's/var delta := event.position - look_last/var delta: Vector2 = event.position - look_last/' scripts/main.gd
+          sed -i 's/gradle_build\/use_gradle_build=false/gradle_build\/use_gradle_build=true/' export_presets.cfg
+          sed -i 's/gradle_build\/target_sdk="35"/gradle_build\/target_sdk="34"/' export_presets.cfg
+          grep -nE 'var x: float|var z: float|var delta: Vector2' scripts/main.gd
+          grep -nE 'use_gradle_build|target_sdk' export_presets.cfg
 
       - name: Import project
         working-directory: BlockWorld3D
@@ -62,6 +74,7 @@ jobs:
         run: |
           mkdir -p build
           godot --headless --path . --export-debug "Android" build/BlockWorld3D.apk
+          test -s build/BlockWorld3D.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
