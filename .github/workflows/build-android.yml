@@ -66,6 +66,13 @@ jobs:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
         run: godot --headless --editor --path . --quit
 
+      - name: Install Android build template
+        working-directory: BlockWorld3D
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+        run: godot --headless --editor --path . --install-android-build-template
+
       - name: Export APK
         working-directory: BlockWorld3D
         env:
